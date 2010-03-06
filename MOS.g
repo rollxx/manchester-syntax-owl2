@@ -63,7 +63,7 @@ individual
 	;
 
 nonNegativeInteger
-	: DIGIT+
+	: DIGITS
 	;
 
 dataPrimary
@@ -143,15 +143,15 @@ inverseObjectProperty
 	;
 
 decimalLiteral
-	: (PLUS | MINUS)? DIGIT+ DOT DIGIT+
+	: (PLUS | MINUS)? DIGITS DOT DIGITS
 	;
 
 integerLiteral
-	: (PLUS | MINUS)? (DIGIT+)=>DIGIT+
+	: (PLUS | MINUS)? DIGITS
 	;
 
 floatingPointLiteral
-	: (PLUS | MINUS) (DIGIT+ (DOT DIGIT+)? EXPONENT? | DOT DIGIT+ EXPONENT?) ('f' | 'F')
+	: (PLUS | MINUS)? ((DIGITS (DOT DIGITS)? EXPONENT?) | DOT DIGITS EXPONENT?) ('f' | 'F')
 	;
 	
 dataRange
@@ -163,7 +163,7 @@ dataConjunction
 	;
 
 annotationAnnotatedList
-	:	(annotations)? annotation (COMMA (annotations) annotation)*
+	:	(annotations)? annotation (COMMA (annotations)? annotation)*
 	;
 
 annotation
@@ -180,7 +180,7 @@ annotations
 	;
 
 descriptionAnnotatedList
-	:	description (COMMA description)*
+	:	annotations? description (COMMA descriptionAnnotatedList)*
 	;
 
 description2List
@@ -202,4 +202,160 @@ classFrame
 	//TODO owl2 primer error?
 	(	HAS_KEY_LABEL annotations?
 			(objectPropertyExpression | dataPropertyExpression)+)?
+	;
+
+
+objectPropertyFrame
+	:	OBJECT_PROPERTY_LABEL iri
+	(	ANNOTATIONS_LABEL annotationAnnotatedList
+		|	RANGE_LABEL descriptionAnnotatedList
+		|	CHARACTERISTICS_LABEL objectPropertyCharacteristicAnnotatedList
+		|	SUB_PROPERTY_OF_LABEL objectPropertyExpressionAnnotatedList
+		|	EQUIVALENT_TO_LABEL objectPropertyExpressionAnnotatedList
+		|	DISJOINT_WITH_LABEL objectPropertyExpressionAnnotatedList
+		|	INVERSE_OF_LABEL objectPropertyExpressionAnnotatedList
+		|	SUB_PROPERTY_CHAIN_LABEL annotations objectPropertyExpression (O_LABEL objectPropertyExpression)+
+		)*
+	;
+
+objectPropertyCharacteristicAnnotatedList
+	:	annotations? OBJECT_PROPERTY_CHARACTERISTIC (COMMA objectPropertyCharacteristicAnnotatedList)*
+	;
+
+
+objectPropertyExpressionAnnotatedList
+	:	annotations? objectPropertyExpression (COMMA objectPropertyExpressionAnnotatedList)*
+	;
+
+dataPropertyFrame
+    : DATA_PROPERTY_LABEL  iri
+    (	ANNOTATIONS_LABEL annotationAnnotatedList
+    |	DOMAIN_LABEL  descriptionAnnotatedList
+    |	RANGE_LABEL  dataRangeAnnotatedList
+    |	CHARACTERISTICS_LABEL  annotations FUNCTIONAL_LABEL
+    |	SUB_PROPERTY_OF_LABEL  dataPropertyExpressionAnnotatedList
+    |	EQUIVALENT_TO_LABEL  dataPropertyExpressionAnnotatedList
+    |	DISJOINT_WITH_LABEL  dataPropertyExpressionAnnotatedList
+    )*
+    ;
+
+dataRangeAnnotatedList
+	:	annotations? dataRange (COMMA dataRangeAnnotatedList)*
+	;
+
+dataPropertyExpressionAnnotatedList
+	:	annotations? dataPropertyExpression (COMMA dataPropertyExpressionAnnotatedList)*
+	;
+
+annotationPropertyFrame
+	:	ANNOTATION_PROPERTY_LABEL iri
+	(	ANNOTATIONS_LABEL  annotationAnnotatedList )*
+	|	DOMAIN_LABEL  iriAnnotatedList
+	|	RANGE_LABEL  iriAnnotatedList
+	|	SUB_PROPERTY_OF_LABEL annotationPropertyIRIAnnotatedList
+	;
+	
+iriAnnotatedList
+	:	annotations? iri (COMMA iriAnnotatedList)*
+	;
+
+annotationPropertyIRIAnnotatedList
+	:	annotations? iri (COMMA annotationPropertyIRIAnnotatedList)*
+	;
+
+individualFrame
+	:	INDIVIDUAL_LABEL  individual
+	(	ANNOTATIONS_LABEL  annotationAnnotatedList
+		|	TYPES_LABEL  descriptionAnnotatedList
+		|	FACTS_LABEL  factAnnotatedList
+		|	SAME_AS_LABEL  individualAnnotatedList
+		|	DIFFERENET_FROM_LABEL  individualAnnotatedList
+	)*
+	;
+
+
+factAnnotatedList
+	:	annotations? fact (COMMA factAnnotatedList)*
+	;
+
+
+individualAnnotatedList
+	:	annotations? individual (COMMA individualAnnotatedList)*
+	;
+fact	:	NOT_LABEL? (objectPropertyFact | dataPropertyFact);
+
+objectPropertyFact
+	:	iri individual
+	;
+
+dataPropertyFact
+	:	iri literal
+	;
+
+datatypeFrame
+	:	DATATYPE_LABEL  dataType
+		(ANNOTATIONS_LABEL  annotationAnnotatedList)*
+		(EQUIVALENT_TO_LABEL  annotations dataRange)?
+		(ANNOTATIONS_LABEL  annotationAnnotatedList)*
+	;
+
+misc	:	EQUIVALENT_CLASSES_LABEL  annotations description2List
+	|	DISJOINT_CLASSES_LABEL  annotations description2List
+	|	EQUIVALENT_PROPERTIES_LABEL  annotations objectProperty2List
+	|	DISJOINT_PROPERTIES_LABEL  annotations objectProperty2List
+	|	EQUIVALENT_PROPERTIES_LABEL  annotations dataProperty2List
+	|	DISJOINT_PROPERTIES_LABEL  annotations dataProperty2List
+	|	SAME_INDIVIDUAL_LABEL  annotations individual2List
+	|	DIFFERENT_INDIVIDUALS_LABEL  annotations individual2List
+	;
+	
+individual2List
+	:	individual COMMA individualList
+	;
+
+dataProperty2List
+	:	dataProperty COMMA dataPropertyList
+	;
+	
+dataPropertyList
+	:	dataProperty (COMMA dataProperty)*
+	;
+
+objectProperty2List
+	:	objectProperty COMMA objectPropertyList
+	;
+
+objectPropertyList
+	:	objectProperty (COMMA objectProperty)*
+	;
+
+objectProperty
+	:	objectPropertyIRI
+	;
+
+dataProperty
+	:	dataPropertyIRI
+	;
+
+dataPropertyIRI
+	:	iri
+	;
+
+datatypeIRI
+	: iri
+	;
+
+objectPropertyIRI
+	: iri
+	;
+
+
+frame
+	: datatypeFrame
+	| classFrame
+	| objectPropertyFrame
+	| dataPropertyFrame
+	| annotationPropertyFrame
+	| individualFrame
+	| misc
 	;

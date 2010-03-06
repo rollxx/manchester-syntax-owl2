@@ -39,8 +39,8 @@ PLUS
     : '+'
     ;
 
-DIGIT
-    : '0'..'9'
+DIGITS
+    : ('0'..'9')+
     ;
 
 NOT_LABEL
@@ -140,85 +140,84 @@ REFERENCE
 	: '^^'
 	;
 
+O_LABEL	:	'o';
 
-fragment
-PN_PREFIX
-    : (PN_CHARS)*
-    ;
-
-fragment
-EOL
-    : '\n' | '\r'
-    ;
-
-
-fragment
-PN_CHARS_BASE
-    : 'A'..'Z'
-    | 'a'..'z'
-    | '\u00C0'..'\u00D6'
-    | '\u00D8'..'\u00F6'
-    | '\u00F8'..'\u02FF'
-    | '\u0370'..'\u037D'
-    | '\u037F'..'\u1FFF'
-    | '\u200C'..'\u200D'
-    | '\u2070'..'\u218F'
-    | '\u2C00'..'\u2FEF'
-    | '\u3001'..'\uD7FF'
-    | '\uF900'..'\uFDCF'
-    | '\uFDF0'..'\uFFFD'
-    ;
-
-fragment
-PN_CHARS_U
-    : PN_CHARS_BASE | '_'
-    ;
-
-FULL_IRI
-    : LESS ( options {greedy=false;} : ~(LESS | GREATER | '"' | OPEN_CURLY_BRACE | CLOSE_CURLY_BRACE | '|' | '^' | '\\' | '`' | ('\u0000'..'\u0020')) )* GREATER
-    //{\$this->setText(substr(\$this->getText(), 1, strlen(\$this->getText()) - 2)); }
-    ;
-
-SIMPLE_IRI
-	: ( PN_CHARS_U | DIGIT) ((PN_CHARS|DOT)* PN_CHARS)?
+RANGE_LABEL
+	:	'Range:'
 	;
-NODE_ID
-    : '_:' t=SIMPLE_IRI //{\$this->setText($t.text); }
-    ;
-fragment
-PN_CHARS
-    : PN_CHARS_U
-    | MINUS
-    | DIGIT
-    | '\u00B7' 
-    | '\u0300'..'\u036F'
-    | '\u203F'..'\u2040'
-    ;
+	
+CHARACTERISTICS_LABEL
+	:	'Characteristics:'
+	;
 
-OPEN_SQUARE_BRACE
-    : '['
-    ;
+SUB_PROPERTY_OF_LABEL
+	:	'SubPropertyOf:'
+	;
+	
+SUB_PROPERTY_CHAIN_LABEL
+	:	'SubPropertyChain:'
+	;
 
-CLOSE_SQUARE_BRACE
-    : ']'
-    ;
+OBJECT_PROPERTY_LABEL
+	:	'ObjectProperty:'
+	;
 
-QUOTED_STRING
-    : '"'  ( options {greedy=false;} : ~('\u0022' | '\u005C' | '\u000A' | '\u000D') | ECHAR )* '"'
-    ;
+DATA_PROPERTY_LABEL
+	:	'DataProperty:'
+	;
 
-fragment
-ECHAR
-    : '\\' ('t' | 'b' | 'n' | 'r' | 'f' | '\\' | '"' | '\'')
-    ;
+ANNOTATION_PROPERTY_LABEL
+	:	'AnnotaionProperty:'
+	;
 
 
-LANGUAGE_TAG
-    : '@' (('a'..'z')('A'..'Z'))+ (MINUS (('a'..'z')('A'..'Z')DIGIT)+)*
-    //{\$this->setText(substr(\$this->getText(), 1, strlen(\$this->getText()) - 1)); }
-    ;
+INDIVIDUAL_LABEL
+	:	'Individual:'
+	;
 
+TYPES_LABEL
+	:	'Types:'
+	;
 
+FACTS_LABEL
+	:	'Facts:'
+	;
+
+SAME_AS_LABEL
+	:	'SameAs:'
+	;
+
+DIFFERENET_FROM_LABEL
+	:	'DifferentFrom:'
+	;
+
+DATATYPE_LABEL
+	:	'Datatype:'
+	;
+
+EQUIVALENT_CLASSES_LABEL
+	:	'EquivalentClasses:'
+	;
+
+DISJOINT_CLASSES_LABEL
+	:	'DisjointClasses:'
+	;
+	
+EQUIVALENT_PROPERTIES_LABEL
+	:	'EquivalentProperties:'
+	;
+
+DISJOINT_PROPERTIES_LABEL
+	:	'DisjointProperties:'
+	;
+
+SAME_INDIVIDUAL_LABEL
+	:	'SameIndividual:'
+	;
+
+DIFFERENT_INDIVIDUALS_LABEL
+	:	'DifferentIndividuals:'
+	;
 
 EQUIVALENT_TO_LABEL
 	:	'EquivalentTo:'
@@ -260,8 +259,136 @@ ANNOTATIONS_LABEL
 CLASS_LABEL
 	:	'Class:'
 	;
+
+OBJECT_PROPERTY_CHARACTERISTIC
+	:	FUNCTIONAL_LABEL
+	|	INVERSE_FUNCTIONAL_LABEL
+	|	REFLEXIVE_LABEL
+	|	IRREFLEXIVE_LABEL
+	|	SYMMETRIC_LABEL
+	|	ASSYMETRIC_LABEL
+	|	TRANSITIVE_LABEL
+	;
+
+fragment
+FUNCTIONAL_LABEL
+	:	'Functional'
+	;
+	
+fragment
+INVERSE_FUNCTIONAL_LABEL
+	:	'InverseFunctional'
+	;
+
+fragment
+REFLEXIVE_LABEL
+	:	'Reflexive'
+	;
+
+fragment
+IRREFLEXIVE_LABEL
+    : 'Irreflexive'
+    ;
+fragment
+SYMMETRIC_LABEL
+    :'Symmetric'
+    ;
+fragment
+ASSYMETRIC_LABEL
+    : 'Assymentric'
+    ;
+fragment
+TRANSITIVE_LABEL
+    : 'Transitive'
+    ;
+fragment
+DOMAIN_LABEL
+	:	'Domain:'
+	;
+
+
+fragment
+PN_PREFIX
+    : (PN_CHARS)*
+    ;
+
+fragment
+EOL
+    : '\n' | '\r'
+    ;
+
+
+fragment
+PN_CHARS_BASE
+    : 'A'..'Z'
+    | 'a'..'z'
+    | '\u00C0'..'\u00D6'
+    | '\u00D8'..'\u00F6'
+    | '\u00F8'..'\u02FF'
+    | '\u0370'..'\u037D'
+    | '\u037F'..'\u1FFF'
+    | '\u200C'..'\u200D'
+    | '\u2070'..'\u218F'
+    | '\u2C00'..'\u2FEF'
+    | '\u3001'..'\uD7FF'
+    | '\uF900'..'\uFDCF'
+    | '\uFDF0'..'\uFFFD'
+    ;
+
+fragment
+PN_CHARS_U
+    : PN_CHARS_BASE | '_'
+    ;
+
+FULL_IRI
+    : LESS ( options {greedy=false;} : ~(LESS | GREATER | '"' | OPEN_CURLY_BRACE | CLOSE_CURLY_BRACE | '|' | '^' | '\\' | '`' | ('\u0000'..'\u0020')) )* GREATER
+    //{\$this->setText(substr(\$this->getText(), 1, strlen(\$this->getText()) - 2)); }
+    ;
+
+SIMPLE_IRI
+	: ( PN_CHARS_U) ((PN_CHARS|DOT)* PN_CHARS)?
+	;
+
+NODE_ID
+    : '_:' t=SIMPLE_IRI //{\$this->setText($t.text); }
+    ;
+fragment
+PN_CHARS
+    : PN_CHARS_U
+    | MINUS
+    | DIGITS
+    | '\u00B7' 
+    | '\u0300'..'\u036F'
+    | '\u203F'..'\u2040'
+    ;
+
+OPEN_SQUARE_BRACE
+    : '['
+    ;
+
+CLOSE_SQUARE_BRACE
+    : ']'
+    ;
+
+QUOTED_STRING
+    : '"'  ( options {greedy=false;} : ~('\u0022' | '\u005C' | '\u000A' | '\u000D') | ECHAR )* '"'
+    ;
+
+fragment
+ECHAR
+    : '\\' ('t' | 'b' | 'n' | 'r' | 'f' | '\\' | '"' | '\'')
+    ;
+
+
+LANGUAGE_TAG
+    : '@' (('a'..'z')|('A'..'Z'))+ (MINUS (('a'..'z')('A'..'Z')DIGITS)+)*
+    //{\$this->setText(substr(\$this->getText(), 1, strlen(\$this->getText()) - 1)); }
+    ;
+
+
+
 EXPONENT
-	: ('e'|'E') (PLUS | MINUS)? DIGIT+
+	: ('e'|'E') (PLUS | MINUS)? DIGITS
 	;
 
 PREFIX_NAME:	PN_PREFIX SEMICOLON
