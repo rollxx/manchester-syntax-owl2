@@ -12,7 +12,7 @@ description
 
 conjunction
 	:	primary (AND_LABEL primary)*
-	|	iri THAT_LABEL primary (AND_LABEL primary)*
+	|	classIRI THAT_LABEL primary (AND_LABEL primary)*
 	;
 
 
@@ -27,7 +27,7 @@ iri
 	;
 	
 objectPropertyExpression
-	:	iri
+	:	objectPropertyIRI
 	|	inverseObjectProperty
 	;
 
@@ -48,17 +48,22 @@ restriction
 	;
 
 atomic
-	:	iri
+	:	classIRI
 	|	OPEN_CURLY_BRACE individualList CLOSE_CURLY_BRACE
 	|	OPEN_BRACE description CLOSE_BRACE
 	;
+
+classIRI
+	: iri
+	;
+
 
 individualList
 	:	individual (COMMA individual)*
 	;
 
 individual
-	: iri
+	: individualIRI
 	| NODE_ID
 	;
 
@@ -82,7 +87,7 @@ literalList
 	;
 
 dataType
-	: iri
+	: datatypeIRI
 	| INTEGER_LABEL
 	| DECIMAL_LABEL
 	| FLOAT_LABEL
@@ -115,7 +120,7 @@ lexicalValue
 	;
 
 dataPropertyExpression
-	:	iri
+	:	dataPropertyIRI
 	;
 
 dataTypeRestriction
@@ -139,7 +144,7 @@ restrictionValue
 	;
 
 inverseObjectProperty
-	:	INVERSE_LABEL iri
+	:	INVERSE_LABEL objectPropertyIRI
 	;
 
 decimalLiteral
@@ -167,7 +172,7 @@ annotationAnnotatedList
 	;
 
 annotation
-	:	iri annotationTarget
+	:	annotationPropertyIRI annotationTarget
 	;
 
 annotationTarget
@@ -192,7 +197,7 @@ descriptionList
 	;
 
 classFrame
-	:	CLASS_LABEL iri
+	:	CLASS_LABEL classIRI
 	(	ANNOTATIONS_LABEL annotationAnnotatedList
 		|	SUBCLASS_OF_LABEL descriptionAnnotatedList
 		|	EQUIVALENT_TO_LABEL descriptionAnnotatedList
@@ -206,7 +211,7 @@ classFrame
 
 
 objectPropertyFrame
-	:	OBJECT_PROPERTY_LABEL iri
+	:	OBJECT_PROPERTY_LABEL objectPropertyIRI
 	(	ANNOTATIONS_LABEL annotationAnnotatedList
 		|	RANGE_LABEL descriptionAnnotatedList
 		|	CHARACTERISTICS_LABEL objectPropertyCharacteristicAnnotatedList
@@ -228,7 +233,7 @@ objectPropertyExpressionAnnotatedList
 	;
 
 dataPropertyFrame
-    : DATA_PROPERTY_LABEL  iri
+    : DATA_PROPERTY_LABEL  dataPropertyIRI
     (	ANNOTATIONS_LABEL annotationAnnotatedList
     |	DOMAIN_LABEL  descriptionAnnotatedList
     |	RANGE_LABEL  dataRangeAnnotatedList
@@ -248,7 +253,7 @@ dataPropertyExpressionAnnotatedList
 	;
 
 annotationPropertyFrame
-	:	ANNOTATION_PROPERTY_LABEL iri
+	:	ANNOTATION_PROPERTY_LABEL annotationPropertyIRI
 	(	ANNOTATIONS_LABEL  annotationAnnotatedList )*
 	|	DOMAIN_LABEL  iriAnnotatedList
 	|	RANGE_LABEL  iriAnnotatedList
@@ -259,8 +264,12 @@ iriAnnotatedList
 	:	annotations? iri (COMMA iriAnnotatedList)*
 	;
 
+annotationPropertyIRI
+	:	iri
+	;
+
 annotationPropertyIRIAnnotatedList
-	:	annotations? iri (COMMA annotationPropertyIRIAnnotatedList)*
+	:	annotations? annotationPropertyIRI (COMMA annotationPropertyIRIAnnotatedList)*
 	;
 
 individualFrame
@@ -285,11 +294,11 @@ individualAnnotatedList
 fact	:	NOT_LABEL? (objectPropertyFact | dataPropertyFact);
 
 objectPropertyFact
-	:	iri individual
+	:	objectPropertyIRI individual
 	;
 
 dataPropertyFact
-	:	iri literal
+	:	dataPropertyIRI literal
 	;
 
 datatypeFrame
@@ -359,3 +368,41 @@ frame
 	| individualFrame
 	| misc
 	;
+
+entity
+	: DATATYPE_LABEL OPEN_BRACE dataType CLOSE_BRACE
+	| CLASS_LABEL OPEN_BRACE classIRI CLOSE_BRACE
+	| OBJECT_PROPERTY_LABEL OPEN_BRACE objectPropertyIRI CLOSE_BRACE
+	| DATA_PROPERTY_LABEL OPEN_BRACE datatypePropertyIRI CLOSE_BRACE
+	| ANNOTATION_PROPERTY_LABEL OPEN_BRACE annotationPropertyIRI CLOSE_BRACE
+	| NAMED_INDIVIDUAL_LABEL OPEN_BRACE individualIRI CLOSE_BRACE
+	;
+
+individualIRI
+	: iri
+	;
+
+datatypePropertyIRI
+	: iri
+	;
+
+ontologyDocument
+	:	prefixDeclaration* ontology
+	;
+
+prefixDeclaration
+	:	PREFIX_LABEL PREFIX_NAME FULL_IRI
+	;
+
+ontology
+	: ONTOLOGY_LABEL (ontologyIri (versionIri)?)? imports* annotations* frame*
+	;
+
+ontologyIri
+	: iri
+	;
+
+versionIri
+	:	iri
+	;
+imports	:	IMPORT_LABEL iri;

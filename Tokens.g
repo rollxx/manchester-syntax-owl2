@@ -170,6 +170,17 @@ ANNOTATION_PROPERTY_LABEL
 	:	'AnnotaionProperty:'
 	;
 
+NAMED_INDIVIDUAL_LABEL
+	:	'NamedIndividual'
+	;
+
+PREFIX_LABEL
+	:	'Prefix:'
+	;
+
+ONTOLOGY_LABEL
+	:	'Ontology:'
+	;
 
 INDIVIDUAL_LABEL
 	:	'Individual:'
