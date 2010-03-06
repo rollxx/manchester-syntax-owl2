@@ -1,33 +1,129 @@
 grammar MOS ;
 	
 rule	:	conjunction;
+SOME_LABEL
+	:	'some'
+	;
+
+ONLY_LABEL
+	:	'only'
+	;
+
+VALUE_LABEL
+	:	'value'
+	;
+	
+SELF_LABEL
+	:	'Self'
+	;
+
+MIN_LABEL
+	:	'min'
+	;
+
+MAX_LABEL
+	:	'max'
+	;
+
+EXACTLY_LABEL
+	:	'exactly'
+	;
+THAT_LABEL
+	:	'that'
+	;
+
+OR_LABEL
+	:	'or'
+	;
+
+AND_LABEL
+	:	'and'
+	;
+NOT_LABEL
+	:	'not'
+	;
+
+NODE_ID
+    : '_:' t=SIMPLE_IRI //{\$this->setText($t.text); }
+    ;
+INTEGER_LABEL
+	:	'integer'
+	;
+
+DECIMAL_LABEL
+	:	'decimal'
+	;
+
+FLOAT_LABEL
+	:	'float'
+	;
+
+STRING_LABEL
+	:	'string'
+	;
+
+LENGTH_LABEL
+	:	'length'
+	;
+
+MIN_LENGTH_LABEL
+	:	'minLength'
+	;
+
+MAX_LENGTH_LABEL
+	:	'maxLength'
+	;
+
+PATTERN_LABEL
+	:	'pattern'
+	;
+
+LANG_PATTERN_LABEL
+	:	'langPattern'
+	;
+INVERSE_LABEL
+	:	'inverse'
+	;
+
+DIGIT
+    : '0'..'9'
+    ;
+
+individual
+	: NODE_ID
+	| iri
+	;
+
+
+inverseObjectProperty
+	:	INVERSE_LABEL iri
+	;
+
+objectPropertyExpression
+	:	//IRI
+	//|	
+	inverseObjectProperty
+	;
 
 description
 	: iri
-	(conjunction (OR_LABEL conjunction)*) EOF
+	(conjunction (OR_LABEL conjunction)*)
 	;
 
 conjunction
-	:	classIRI THAT_LABEL primary (AND_LABEL primary)*
+	:	iri THAT_LABEL primary (AND_LABEL primary)*
 	|	primary (AND_LABEL primary)*
 	;
 
 WS
-    : (' '| '\t'| EOL)+ {$channel = HIDDEN;}
+    : (' '| '\t'| EOL)+ {$channel=HIDDEN;}
     ;
 
-THAT_LABEL
-	:	'that'
-	;
 primary
 	:	(NOT_LABEL)? (restriction | atomic)
 	;
 
-objectPropertyIRI
-	: iri
-	;
-	
-fullIRI
+FULL_IRI
     : LESS ( options {greedy=false;} : ~(LESS | GREATER | '"' | OPEN_CURLY_BRACE | CLOSE_CURLY_BRACE | '|' | '^' | '\\' | '`' | ('\u0000'..'\u0020')) )* GREATER
     //{\$this->setText(substr(\$this->getText(), 1, strlen(\$this->getText()) - 2)); }
     ;
@@ -56,25 +152,10 @@ CLOSE_CURLY_BRACE
 	: '}'
 	;
 
-OR_LABEL
-	:	'or'
-	;
-
-andRule	:  iri
-	;
-
-AND_LABEL
-	:	'and'
-	;
-
 iri
-	: fullIRI
-	| abbreviatedIRI
-	| simpleIRI
-	;
-objectPropertyExpression
-	:	objectPropertyIRI
-	|	inverseObjectProperty
+	: FULL_IRI
+//	| ABBREVIATED_IRI
+	| SIMPLE_IRI
 	;
 
 restriction
@@ -93,59 +174,16 @@ restriction
 //	|	dataPropertyExpression EXACTLY_LABEL nonNegativeInteger (dataRange)?
 	;
 
-SOME_LABEL
-	:	'some'
-	;
-
-ONLY_LABEL
-	:	'only'
-	;
-
-VALUE_LABEL
-	:	'value'
-	;
-	
-SELF_LABEL
-	:	'Self'
-	;
-
-MIN_LABEL
-	:	'min'
-	;
-
-MAX_LABEL
-	:	'max'
-	;
-
-EXACTLY_LABEL
-	:	'exactly'
-	;
 
 atomic
-	:	classIRI
+	:	iri
 	|	OPEN_CURLY_BRACE individualList CLOSE_CURLY_BRACE
 	|	OPEN_BRACE description CLOSE_BRACE
-	;
-NOT_LABEL
-	:	'not'
 	;
 
 individualList
 	:	individual (COMMA individual)*
 	;
-
-individual
-	: individualIRI
-	| nodeID
-	;
-
-individualIRI
-	: iri
-	;
-
-nodeID
-    : '_:' t=simpleIRI //{\$this->setText($t.text); }
-    ;
 
 COMMA	:	',';
 
@@ -160,10 +198,6 @@ CLOSE_BRACE
 nonNegativeInteger
 	: DIGIT+
 	;
-
-DIGIT
-    : '0'..'9'
-    ;
 
 dataPrimary
 	:	NOT_LABEL? dataAtomic
@@ -181,32 +215,13 @@ literalList
 	;
 
 dataType
-	: datatypeIRI
+	: iri
 	| INTEGER_LABEL
 	| DECIMAL_LABEL
 	| FLOAT_LABEL
 	| STRING_LABEL
 	;
 
-INTEGER_LABEL
-	:	'integer'
-	;
-
-DECIMAL_LABEL
-	:	'decimal'
-	;
-
-FLOAT_LABEL
-	:	'float'
-	;
-
-STRING_LABEL
-	:	'string'
-	;
-
-datatypeIRI
-	: iri
-	;
 
 literal
 	: typedLiteral
@@ -263,10 +278,6 @@ MINUS
     ;
 
 dataPropertyExpression
-	:	dataPropertyIRI
-	;
-
-dataPropertyIRI
 	:	iri
 	;
 
@@ -294,37 +305,10 @@ facet
 	|	GREATER
 	;
 
-LENGTH_LABEL
-	:	'length'
-	;
-
-MIN_LENGTH_LABEL
-	:	'minLength'
-	;
-
-MAX_LENGTH_LABEL
-	:	'maxLength'
-	;
-
-PATTERN_LABEL
-	:	'pattern'
-	;
-
-LANG_PATTERN_LABEL
-	:	'langPattern'
-	;
-
 restrictionValue
 	:	literal
 	;
 
-inverseObjectProperty
-	:	INVERSE_LABEL objectPropertyIRI
-	;
-
-INVERSE_LABEL
-	:	'inverse'
-	;
 
 decimalLiteral
 	: (PLUS | MINUS)? DIGIT+ DOT DIGIT+
@@ -332,7 +316,7 @@ decimalLiteral
 
 integerLiteral
 	: (PLUS | MINUS)? DIGIT+
-	;
+		;
 
 floatingPointLiteral
 	: (PLUS | MINUS) (DIGIT+ (DOT DIGIT+)? EXPONENT? | DOT DIGIT+ EXPONENT?) ('f' | 'F')
@@ -350,22 +334,19 @@ dataConjunction
 	:	dataPrimary (AND_LABEL dataPrimary)*
 	;
 
-classIRI
-	: iri
-	;
-
-abbreviatedIRI
-    : prefixName simpleIRI
-    ;
-
-    
-prefixName
-    : PN_PREFIX? ':'
-    ;
-
 //fragment
+//ABBREVIATED_IRI
+//    : PREFIX_NAME SIMPLE_IRI
+//    ;
+
+fragment
+PREFIX_NAME
+    : PN_PREFIX ':'
+    ;
+
+fragment
 PN_PREFIX
-    : (PN_CHARS)* // ~TERMINALS
+    : (PN_CHARS)*
     ;
 
 fragment
@@ -400,35 +381,11 @@ PN_CHARS
     | '\u203F'..'\u2040'
     ;
 
-simpleIRI
-	:	PN_LOCAL
+SIMPLE_IRI
+	: ( PN_CHARS_U) ((PN_CHARS|DOT)* PN_CHARS)?
 	;
-
-PN_LOCAL
-    : ( PN_CHARS_U | DIGIT ) ((PN_CHARS|DOT)* PN_CHARS)?
-    ;
-
 
 fragment
 EOL
     : '\n' | '\r'
     ;
-
-fragment
-TERMINALS
-	:	AND_LABEL
-	|	OR_LABEL
-	|	INVERSE_LABEL
-	|	LENGTH_LABEL
-	|	MAX_LABEL
-	|	MAX_LENGTH_LABEL
-	|	PATTERN_LABEL
-	|	SOME_LABEL
-	|	ONLY_LABEL
-	|	VALUE_LABEL
-	|	SELF_LABEL
-	|	INTEGER_LABEL
-	|	DECIMAL_LABEL
-	|	FLOAT_LABEL
-	|	STRING_LABEL
-	;
