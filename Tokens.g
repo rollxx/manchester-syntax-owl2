@@ -1,5 +1,7 @@
 lexer grammar Tokens;
 
+O_LABEL	:	'o';
+
 LENGTH_LABEL
 	:	'length'
 	;
@@ -140,7 +142,6 @@ REFERENCE
 	: '^^'
 	;
 
-O_LABEL	:	'o';
 
 RANGE_LABEL
 	:	'Range:'
@@ -258,11 +259,6 @@ IMPORT_LABEL
 	:	'Import:'
 	;
 
-SEMICOLON
-	:	':'
-	;
-
-
 ANNOTATIONS_LABEL
 	:	'Annotations:'
 	;
@@ -356,10 +352,6 @@ FULL_IRI
     //{\$this->setText(substr(\$this->getText(), 1, strlen(\$this->getText()) - 2)); }
     ;
 
-SIMPLE_IRI
-	: ( PN_CHARS_U) ((PN_CHARS|DOT)* PN_CHARS)?
-	;
-
 NODE_ID
     : '_:' t=SIMPLE_IRI //{\$this->setText($t.text); }
     ;
@@ -396,14 +388,16 @@ LANGUAGE_TAG
     //{\$this->setText(substr(\$this->getText(), 1, strlen(\$this->getText()) - 1)); }
     ;
 
-
-
 EXPONENT
 	: ('e'|'E') (PLUS | MINUS)? DIGITS
 	;
 
-PREFIX_NAME:	PN_PREFIX SEMICOLON
+PREFIX_NAME:	PN_PREFIX ':'
 	;
 ABBREVIATED_IRI
     : PREFIX_NAME SIMPLE_IRI
     ;
+
+SIMPLE_IRI
+	: ( PN_CHARS_U) (DOT? PN_CHARS)*
+	;

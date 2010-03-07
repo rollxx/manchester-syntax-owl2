@@ -1,7 +1,7 @@
 grammar MOS ;
 	
 options {
-language = Java;
+language = Php;
 backtrack=true;
 }
 import Tokens;
